@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Link Page to Groups
  * Plugin URI: http://buddydev.com/link-page-to-groups/
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: BuddyDev,
  * Author URI: http://BuddyDev.com
  * Description: Link a Page to a BuddyPress Group
@@ -36,8 +36,23 @@ class BP_Link_Page_Group_Helper {
 		add_action( 'bp_group_options_nav', array( $this, 'show_links') );
 		add_action( 'bp_groups_admin_meta_boxes', array( $this, 'add_metabox' ) );
 		add_action( 'bp_group_admin_edit_after', array( $this, 'update' ) );
+		
+		if ( apply_filters( 'bp_allow_fronted_group_page_liking', false ) ) {
+			$this->enable_frontend_settings();
+		}
 	}
 	
+	/**
+	 * These hooks are only applied if a side admin allows group admins to modify the settings
+	 * 
+	 */
+	private function enable_frontend_settings() {
+		
+		add_action( 'bp_after_group_settings_admin', array( $this, 'show_settings' ), 1000 );
+		add_action( 'groups_group_settings_edited', array( $this, 'update' ) );
+		add_action( 'groups_update_group', array( $this, 'update' ) );
+		
+	}
 	/**
 	 * Show attached page in menu
 	 * 
@@ -103,6 +118,10 @@ class BP_Link_Page_Group_Helper {
 			return ;
 		}
 		
+		if( ! $this->current_user_can_modify_settings( $group_id ) ) {
+			return ;
+		}
+		
 		if ( ! wp_verify_nonce( $_POST['_bp_linked_group_page_nonce'], '_bp_linked_group_page' ) ) {
 			return ;
 		}
@@ -119,6 +138,37 @@ class BP_Link_Page_Group_Helper {
 			
 		
 	}
+	
+	
+	/**
+	 * Show settings on single group page in front end
+	 * 
+	 */
+	public function show_settings() {
+		
+		$group_id = bp_get_current_group_id();
+		
+		if ( $this->current_user_can_modify_settings( $group_id ) ) {
+			echo "<div class='group-page-link-box'>";
+				$this->admin_metabox( groups_get_current_group() );
+			echo "</div>";
+		}
+	}
+	
+	private function current_user_can_modify_settings( $group_id = false  ) {
+		
+		
+		if ( ! $group_id ) {
+			$group_id = bp_get_current_group_id();
+		}
+		
+		if ( is_super_admin() || groups_is_user_admin( get_current_user_id(), $group_id ) ) {
+			return true;
+		}
+		
+		return false;
+	}
+	
 }
 
 BP_Link_Page_Group_Helper::get_instance();
