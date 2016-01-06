@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Link Page to Groups
  * Plugin URI: http://buddydev.com/link-page-to-groups/
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: BuddyDev,
  * Author URI: http://BuddyDev.com
  * Description: Link a Page to a BuddyPress Group
