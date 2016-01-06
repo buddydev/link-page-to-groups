@@ -150,8 +150,10 @@ class BP_Link_Page_Group_Helper {
 		
 		if ( $this->current_user_can_modify_settings( $group_id ) ) {
 			echo "<div class='group-page-link-box'>";
+			echo "<h4>" . __( 'Link to Page', 'link-page-to-groups' ) ."</h4>";
 				$this->admin_metabox( groups_get_current_group() );
 			echo "</div>";
+			echo "<hr />";
 		}
 	}
 	
